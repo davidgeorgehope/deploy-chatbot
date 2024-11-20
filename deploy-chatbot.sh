@@ -241,6 +241,9 @@ spec:
   backoffLimit: 4
 EOF
 
+sed -i "s/\${AWS_ACCOUNT_ID}/$AWS_ACCOUNT_ID/g" init-index-job.yaml
+sed -i "s/\${AWS_REGION}/$AWS_REGION/g" init-index-job.yaml
+
 # Delete old job
 kubectl delete job $(kubectl get jobs | grep init-elasticsearch | awk '{print $1}') || true
 
