@@ -244,19 +244,6 @@ EOF
 sed -i "s/\${AWS_ACCOUNT_ID}/$AWS_ACCOUNT_ID/g" init-index-job.yaml
 sed -i "s/\${AWS_REGION}/$AWS_REGION/g" init-index-job.yaml
 
-# Delete old job
-kubectl delete job $(kubectl get jobs | grep init-elasticsearch | awk '{print $1}') || true
-
-# Apply new job
-kubectl apply -f init-index-job.yaml
-
-# Store the job name
-JOB_NAME="init-elasticsearch-index-${TIMESTAMP}"
-
-# Check job status
-kubectl get jobs
-kubectl logs job/"${JOB_NAME}"
-
 # Apply Kubernetes configurations
 echo "Applying Kubernetes configurations..."
 kubectl apply -f k8s-deployment.yaml
@@ -270,6 +257,19 @@ echo "Waiting for LoadBalancer to be ready..."
 sleep 30
 echo "Application URL:"
 kubectl get service chatbot-rag-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+
+# Delete old job
+kubectl delete job $(kubectl get jobs | grep init-elasticsearch | awk '{print $1}') || true
+
+# Apply new job
+kubectl apply -f init-index-job.yaml
+
+# Store the job name
+JOB_NAME="init-elasticsearch-index-${TIMESTAMP}"
+
+# Check job status
+kubectl get jobs
+kubectl logs job/"${JOB_NAME}"
 
 # Clean up temporary directory
 cd -
